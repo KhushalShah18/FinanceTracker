@@ -5,7 +5,8 @@ import {
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, desc } from "drizzle-orm";
-import session, { Store as SessionStore } from "express-session";
+import session from "express-session";
+type SessionStore = session.Store;
 import connectPg from "connect-pg-simple";
 import createMemoryStore from "memorystore";
 import postgres from "postgres";
