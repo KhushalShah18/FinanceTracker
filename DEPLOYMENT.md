@@ -1,153 +1,191 @@
-# FinTrack Deployment Instructions for Azure
+# Deployment Guide for FinTrack
 
-This document provides instructions for deploying the FinTrack finance tracking application to Azure Web App Service with Azure PostgreSQL.
+This guide provides step-by-step instructions for deploying the FinTrack application to Azure App Service using PostgreSQL.
 
 ## Prerequisites
 
-1. An Azure account with an active subscription
-2. Azure CLI installed (optional, but helpful)
-3. Git installed on your local machine
-4. Node.js installed on your local machine
+1. **Azure Account** - You need an active Azure subscription.
+2. **Azure CLI** - Install the [Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli) on your local machine.
+3. **Git** - Make sure Git is installed on your development machine.
+4. **Node.js** - Version 18+ is required.
 
-## Step 1: Create an Azure Database for PostgreSQL
+## Step 1: Set Up Azure PostgreSQL Database
 
-1. **Sign in to the Azure Portal**:
-   - Go to https://portal.azure.com
-   - Sign in with your Azure account
-
-2. **Create a PostgreSQL flexible server**:
+1. Log in to the Azure Portal: https://portal.azure.com
+2. Create a new Azure Database for PostgreSQL:
    - Click "Create a resource"
-   - Search for "Azure Database for PostgreSQL" and select it
-   - Choose "Flexible server" deployment option and click "Create"
-   - Fill in the server details:
-     - **Server name**: Choose a unique name (e.g., `fintrack-postgres`)
-     - **Region**: Select the closest region to your users
-     - **Version**: Choose PostgreSQL 14 (or latest available)
-     - **Admin username**: Create a username (e.g., `postgres`)
-     - **Password**: Create a strong password and save it securely
-   - Click "Next: Networking"
-   - Configure Networking:
-     - **Connectivity method**: Select "Public access"
-     - **Allow public access from any Azure service...**: Yes
-     - Add your client IP address if you need to connect from your local machine
-   - Click "Review + create" and then "Create"
-
-3. **Create a database**:
-   - Once the PostgreSQL server is deployed, navigate to it
-   - Select "Databases" from the left menu
-   - Click "Add" to create a new database
-   - Name it `fintrack` and click "Save"
-
-4. **Get the connection string**:
-   - On your PostgreSQL server resource, go to "Connection strings"
-   - Note down the PostgreSQL connection string
-   - It will look like: `postgres://username:password@server-name.postgres.database.azure.com/fintrack?sslmode=require`
-
-## Step 2: Create an Azure Web App
-
-1. **Create a Web App**:
-   - In the Azure Portal, click "Create a resource"
-   - Search for "Web App" and select it
+   - Search for "Azure Database for PostgreSQL"
+   - Select "Azure Database for PostgreSQL Flexible Server"
    - Click "Create"
-   - Configure the Web App:
-     - **Subscription**: Select your subscription
-     - **Resource Group**: Use the same resource group as your PostgreSQL server
-     - **Name**: Choose a unique name (e.g., `fintrack-app`)
-     - **Publish**: Code
-     - **Runtime stack**: Node 18 LTS (or latest LTS)
-     - **Operating System**: Linux
-     - **Region**: Same region as your PostgreSQL server
-   - Click "Next: Deployment" and enable "Local Git" deployment option
-   - Click "Review + create" and then "Create"
 
-2. **Configure environment variables**:
-   - Once the Web App is deployed, navigate to it
-   - Go to "Configuration" in the left menu
-   - Add the following Application settings:
-     - **DATABASE_URL**: Your PostgreSQL connection string
-     - **SESSION_SECRET**: A long random string for session encryption
-     - **NODE_ENV**: `production`
+3. Fill in the required details:
+   - **Server name**: Choose a unique name (e.g., `fintrack-db`)
+   - **Region**: Choose a region close to your users
+   - **Admin username**: Create an admin username
+   - **Password**: Create a secure password
+   - **Version**: Choose PostgreSQL 15 or higher
+
+4. Under "Networking", enable "Allow public access from any Azure service and resources within Azure"
+5. Click "Review + create", then "Create"
+
+6. Once the database is created, you'll need to create a database:
+   - Go to your PostgreSQL server
+   - Click on "Databases" in the left sidebar
+   - Click "Add"
+   - Enter a name for your database (e.g., `fintrack`)
    - Click "Save"
 
-## Step 3: Configure Local Git Deployment
+## Step 2: Set Up Azure App Service
 
-1. **Set up deployment credentials**:
-   - In your Web App, go to "Deployment Center"
-   - Choose "Local Git" as the source
+1. In the Azure Portal, create a new App Service:
+   - Click "Create a resource"
+   - Search for "Web App"
+   - Click "Create"
+
+2. Fill in the required details:
+   - **Subscription**: Choose your subscription
+   - **Resource Group**: Use the same resource group as your database
+   - **Name**: Choose a unique name (e.g., `fintrack-app`)
+   - **Publish**: Code
+   - **Runtime stack**: Node 18 LTS
+   - **Operating System**: Linux
+   - **Region**: Same as your database
+   - **App Service Plan**: Create a new plan or use an existing one
+   - **Pricing Plan**: Choose an appropriate plan (B1 is a good starting point)
+
+3. Click "Review + create", then "Create"
+
+## Step 3: Configure Deployment Settings
+
+1. Go to your App Service:
+   - Click on "Deployment Center" in the left sidebar
+   - Select "Local Git" as the source
    - Click "Save"
-   - Configure deployment credentials if prompted:
-     - Create a username and password for Git deployments
 
-2. **Get Git repository URL**:
-   - In the "Deployment Center", you should see the Git repository URL
-   - Note this URL as you'll use it to push your code
+2. Note the Git clone URL provided, it should look like: 
+   `https://<username>@<app-name>.scm.azurewebsites.net/<app-name>.git`
 
-## Step 4: Prepare Your Application for Deployment
+3. Configure deployment credentials:
+   - Click on "Deployment Credentials" in the left sidebar
+   - Choose "User Credentials"
+   - Set a username and password to use for deployments
+   - Click "Save"
 
-1. **Ensure you have the necessary configuration files**:
-   - `.deployment` - Tells Azure to run the build during deployment and points to our custom script
-   - `.npmrc` - Ensures devDependencies are installed during build
-   - `web.config` - Configures how Azure runs the Node.js application
-   - `.azure/deploy.sh` - Custom deployment script that handles installation, building, and database migrations
+## Step 4: Configure Environment Variables
 
-   These files should already be in the repository.
+1. In your App Service, go to "Configuration":
+   - Click on "Application settings" tab
+   - Click "New application setting" to add each of the following:
 
-2. **Configure your local Git repository**:
+   ```
+   DATABASE_URL=postgres://<username>:<password>@<server-name>.postgres.database.azure.com:5432/<database-name>?sslmode=require
+   NODE_ENV=production
+   SESSION_SECRET=<generate-a-long-random-string>
+   ```
+
+   Replace `<username>`, `<password>`, `<server-name>`, and `<database-name>` with your actual database credentials.
+   
+   **Important**: Ensure the hostname uses periods instead of slashes (e.g., `fintrack-db.postgres.database.azure.com`)
+
+2. Click "Save" to apply the settings.
+
+## Step 5: Prepare Application for Deployment
+
+1. In your local development environment, prepare your application:
+
+   ```bash
+   # Build the frontend assets
+   npm run build
+   
+   # Run the deploy script to copy the built assets to the server/public directory
+   node scripts/deploy.js
+   ```
+
+2. The deploy script will copy the built frontend files to the `server/public` directory, which will be served by the Express server in production.
+
+## Step 6: Deploy to Azure
+
+1. Set up your local Git repository (if you haven't already):
+
    ```bash
    git init
    git add .
-   git commit -m "Initial commit"
+   git commit -m "Initial commit for deployment"
    ```
 
-3. **Add Azure as a remote**:
+2. Add Azure as a remote repository:
+
    ```bash
-   git remote add azure <your-azure-git-repo-url>
+   git remote add azure <git-clone-url-from-step-3>
    ```
 
-4. **Push your code to Azure**:
+3. Push to Azure:
+
    ```bash
    git push azure main
    ```
-   - You'll be prompted for the deployment credentials you created earlier
-   - The deployment process will start automatically
 
-## Step 5: Initialize the Database
+   This will upload your code to Azure and trigger the deployment process.
 
-The first deployment will automatically run your database migrations using the `drizzle-kit push` command that is configured in the package.json scripts.
+## Step 7: Verify Deployment
 
-## Step 6: Verify Your Deployment
+1. Once the deployment is complete, visit your application URL: `https://<app-name>.azurewebsites.net`
 
-1. Open your web app URL (e.g., `https://fintrack-app.azurewebsites.net`)
-2. The application should be running and you should be able to:
-   - Register an account
-   - Log in
-   - Add and manage financial transactions
+2. If you encounter any issues, check the logs in the Azure portal:
+   - Go to your App Service
+   - Click "Log stream" in the left sidebar to see real-time logs
+   - Or click "Advanced Tools" (Kudu) for more detailed diagnostics
+
+## Additional Configuration for Production
+
+### Configure SSL/TLS
+
+By default, Azure App Service provides an HTTPS endpoint with a `*.azurewebsites.net` certificate. If you're using a custom domain:
+
+1. Go to your App Service
+2. Click "Custom domains" in the left sidebar
+3. Click "Add binding" to add your custom domain
+4. Set up TLS/SSL binding for your custom domain
+
+### Set Up Continuous Deployment (Optional)
+
+For continuous deployment from GitHub or Azure DevOps:
+
+1. Go to your App Service
+2. Click "Deployment Center" in the left sidebar
+3. Select your source (GitHub, Azure DevOps, etc.)
+4. Follow the prompts to connect your repository
+
+### Monitoring and Scaling
+
+1. Set up monitoring:
+   - Go to your App Service
+   - Click "Application Insights" to enable detailed monitoring
+
+2. Configure scaling:
+   - Click "Scale up" to choose a different pricing tier
+   - Click "Scale out" to configure autoscaling rules
 
 ## Troubleshooting
 
-If you encounter issues:
+### Database Connection Issues
 
-1. **Check application logs**:
-   - In your Web App resource, go to "App Service logs" and enable them
-   - Then go to "Log stream" to see real-time logs
+- Make sure the `DATABASE_URL` format is correct with the proper hostname format
+- Ensure your database's firewall rules allow Azure services to access it
+- Check the database connection string is properly formatted with the right credentials
 
-2. **Check deployment logs**:
-   - In "Deployment Center", check the deployment history for errors
+### Application Not Starting
 
-3. **Verify environment variables**:
-   - Ensure all required environment variables are set correctly
-   - Check for typos in the connection string
+- Check the logs in the Azure portal using "Log stream"
+- Verify that the `NODE_ENV` is set to "production"
+- Make sure all required environment variables are set correctly
 
-4. **Database connectivity**:
-   - Ensure your Web App can connect to the PostgreSQL database
-   - Check if the PostgreSQL server's firewall allows connections from Azure services
+### Static Files Not Being Served
 
-## Making Updates
+- Ensure the build process completed successfully
+- Verify that the deploy script copied the files to the `server/public` directory
+- Check if the web.config file is correctly set up to handle Node.js applications
 
-To update your application:
+## Support
 
-1. Make your changes locally
-2. Commit them: `git commit -am "Update description"`
-3. Push to Azure: `git push azure main`
-
-The deployment will be triggered automatically.
+If you encounter any issues not covered in this guide, please contact our support team or create an issue in the project repository.
