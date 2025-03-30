@@ -91,17 +91,16 @@ This guide provides step-by-step instructions for deploying the FinTrack applica
 
 ## Step 5: Prepare Application for Deployment
 
-1. In your local development environment, prepare your application:
+The application includes deployment configuration files that handle the build process automatically on Azure:
 
-   ```bash
-   # Build the frontend assets
-   npm run build
-   
-   # Run the deploy script to copy the built assets to the server/public directory
-   node scripts/deploy.js
-   ```
+- `.deployment` - Tells Azure to use our custom deployment script
+- `.azure/deploy.sh` - Custom deployment script that:
+  - Builds the application
+  - Copies built assets to the server/public directory
+  - Sets up the production environment
+  - Runs database migrations
 
-2. The deploy script will copy the built frontend files to the `server/public` directory, which will be served by the Express server in production.
+These files are already included in the repository, so no manual preparation is needed before deployment.
 
 ## Step 6: Deploy to Azure
 
@@ -168,23 +167,33 @@ For continuous deployment from GitHub or Azure DevOps:
 
 ## Troubleshooting
 
+### Deployment Script Errors
+
+- If you see errors related to missing npm scripts (e.g., "Missing script: azure-deploy"):
+  - Make sure your `.deployment` file is correctly configured to run `.azure/deploy.sh`
+  - Ensure the deploy.sh script has execute permissions (`chmod +x .azure/deploy.sh`)
+  - Try manually editing the `.deployment` file in the Azure App Service Kudu console
+
 ### Database Connection Issues
 
 - Make sure the `DATABASE_URL` format is correct with the proper hostname format
 - Ensure your database's firewall rules allow Azure services to access it
 - Check the database connection string is properly formatted with the right credentials
+- Verify that your PostgreSQL server is configured to accept connections from Azure services
 
 ### Application Not Starting
 
 - Check the logs in the Azure portal using "Log stream"
 - Verify that the `NODE_ENV` is set to "production"
 - Make sure all required environment variables are set correctly
+- Ensure the `SESSION_SECRET` environment variable is set
 
 ### Static Files Not Being Served
 
 - Ensure the build process completed successfully
 - Verify that the deploy script copied the files to the `server/public` directory
 - Check if the web.config file is correctly set up to handle Node.js applications
+- Inspect the Kudu console logs for any errors during the build or copy process
 
 ## Support
 
