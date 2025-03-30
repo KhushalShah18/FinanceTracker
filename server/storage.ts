@@ -5,7 +5,7 @@ import {
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, desc } from "drizzle-orm";
-import session from "express-session";
+import session, { Store as SessionStore } from "express-session";
 import connectPg from "connect-pg-simple";
 import createMemoryStore from "memorystore";
 import postgres from "postgres";
@@ -45,11 +45,11 @@ export interface IStorage {
   }>;
   
   // Session store
-  sessionStore: session.SessionStore;
+  sessionStore: SessionStore;
 }
 
 export class DatabaseStorage implements IStorage {
-  sessionStore: session.SessionStore;
+  sessionStore: SessionStore;
   
   constructor() {
     if (process.env.NODE_ENV === 'production' && process.env.DATABASE_URL) {
