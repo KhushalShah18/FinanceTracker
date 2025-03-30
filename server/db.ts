@@ -1,5 +1,5 @@
-import { drizzle } from "drizzle-orm/neon-serverless";
-import { neon } from "@neondatabase/serverless";
+import { drizzle } from "drizzle-orm/postgres-js";
+import postgres from "postgres";
 import * as schema from "../shared/schema";
 
 // Check if DATABASE_URL is defined
@@ -8,7 +8,7 @@ if (!process.env.DATABASE_URL) {
 }
 
 // Create a client
-const sql = neon(process.env.DATABASE_URL);
+const client = postgres(process.env.DATABASE_URL, { max: 10 });
 
 // Create database instance
-export const db = drizzle(sql, { schema });
+export const db = drizzle(client, { schema });

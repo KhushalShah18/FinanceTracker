@@ -8,7 +8,7 @@ import { eq, and, desc } from "drizzle-orm";
 import session from "express-session";
 import connectPg from "connect-pg-simple";
 import createMemoryStore from "memorystore";
-import { neon } from "@neondatabase/serverless";
+import postgres from "postgres";
 
 // Memory store for session (for development)
 const MemoryStore = createMemoryStore(session);
