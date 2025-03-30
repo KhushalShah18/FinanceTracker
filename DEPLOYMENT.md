@@ -84,19 +84,27 @@ This document provides instructions for deploying the FinTrack finance tracking 
 
 ## Step 4: Prepare Your Application for Deployment
 
-1. **Configure your local Git repository**:
+1. **Ensure you have the necessary configuration files**:
+   - `.deployment` - Tells Azure to run the build during deployment and points to our custom script
+   - `.npmrc` - Ensures devDependencies are installed during build
+   - `web.config` - Configures how Azure runs the Node.js application
+   - `.azure/deploy.sh` - Custom deployment script that handles installation, building, and database migrations
+
+   These files should already be in the repository.
+
+2. **Configure your local Git repository**:
    ```bash
    git init
    git add .
    git commit -m "Initial commit"
    ```
 
-2. **Add Azure as a remote**:
+3. **Add Azure as a remote**:
    ```bash
    git remote add azure <your-azure-git-repo-url>
    ```
 
-3. **Push your code to Azure**:
+4. **Push your code to Azure**:
    ```bash
    git push azure main
    ```
