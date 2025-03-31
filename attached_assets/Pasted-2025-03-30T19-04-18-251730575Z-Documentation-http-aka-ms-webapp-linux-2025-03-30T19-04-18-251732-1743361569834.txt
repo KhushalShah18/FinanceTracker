@@ -1,0 +1,33 @@
+2025-03-30T19:04:18.251730575Z Documentation: http://aka.ms/webapp-linux
+2025-03-30T19:04:18.251732825Z NodeJS quickstart: https://aka.ms/node-qs
+2025-03-30T19:04:18.251735322Z NodeJS Version : v20.18.3
+2025-03-30T19:04:18.251737694Z Note: Any data outside '/home' is not persisted
+2025-03-30T19:04:18.251740117Z
+2025-03-30T19:04:22.456546320Z Starting OpenBSD Secure Shell server: sshd.
+2025-03-30T19:04:22.468333725Z WEBSITES_INCLUDE_CLOUD_CERTS is not set to true.
+2025-03-30T19:04:22.527214771Z Updating certificates in /etc/ssl/certs...
+2025-03-30T19:04:33.838089382Z rehash: warning: skipping ca-certificates.crt,it does not contain exactly one certificate or CRL
+2025-03-30T19:04:33.887392355Z 2 added, 0 removed; done.
+2025-03-30T19:04:33.888063430Z Running hooks in /etc/ca-certificates/update.d...
+2025-03-30T19:04:33.935953990Z done.
+2025-03-30T19:04:33.978073322Z CA certificates copied and updated successfully.
+2025-03-30T19:04:34.320623451Z Starting periodic command scheduler: cron.
+2025-03-30T19:04:34.619616271Z Could not find build manifest file at '/home/site/wwwroot/oryx-manifest.toml'
+2025-03-30T19:04:34.689747628Z Could not find operation ID in manifest. Generating an operation id...
+2025-03-30T19:04:34.689776265Z Build Operation ID: cbbe0bfa-eec1-4fcf-9d99-15b58d549840
+2025-03-30T19:04:35.678095975Z Environment Variables for Application Insight's IPA Codeless Configuration exists..
+2025-03-30T19:04:35.746923017Z Writing output script to '/opt/startup/startup.sh'
+2025-03-30T19:04:35.848400383Z Running #!/bin/sh
+2025-03-30T19:04:35.848421705Z
+2025-03-30T19:04:35.848424670Z # Enter the source directory to make sure the script runs where the user expects
+2025-03-30T19:04:35.848427299Z cd "/home/site/wwwroot"
+2025-03-30T19:04:35.848430120Z
+2025-03-30T19:04:35.848432410Z export NODE_PATH=/usr/local/lib/node_modules:$NODE_PATH
+2025-03-30T19:04:35.848434782Z if [ -z "$PORT" ]; then
+2025-03-30T19:04:35.848437388Z 		export PORT=8080
+2025-03-30T19:04:35.848440057Z fi
+2025-03-30T19:04:35.848442414Z
+2025-03-30T19:04:35.848714145Z PATH="$PATH:/home/site/wwwroot" node app.js
+2025-03-30T19:04:37.561Z ERROR - Container smartspend_1_0c393acc for site smartspend has exited, failing site start
+2025-03-30T19:04:37.572Z ERROR - Container smartspend_1_0c393acc didn't respond to HTTP pings on port: 8080, failing site start. See container logs for debugging.
+2025-03-30T19:04:37.602Z INFO  - Stopping site smartspend because it failed during startup.

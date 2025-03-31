@@ -1,0 +1,18 @@
+2025-03-30T19:26:35.641472534Z     at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:578:26)
+2025-03-30T19:26:35.641475066Z     at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:116:5)
+2025-03-30T19:26:35.641631616Z Attempting to load the server application...
+2025-03-30T19:26:35.652500795Z [UNCAUGHT EXCEPTION] ReferenceError: require is not defined in ES module scope, you can use import instead
+2025-03-30T19:26:35.652530864Z This file is being treated as an ES module because it has a '.js' file extension and '/home/site/wwwroot/package.json' contains "type": "module". To treat it as a CommonJS script, rename it to use the '.cjs' file extension.
+2025-03-30T19:26:35.652534691Z     at file:///home/site/wwwroot/app.js:20:16
+2025-03-30T19:26:35.652537383Z     at ModuleJob.run (node:internal/modules/esm/module_job:271:25)
+2025-03-30T19:26:35.652539784Z     at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:578:26)
+2025-03-30T19:26:35.652542188Z     at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:116:5)/home/LogFiles/2025_03_30_lw0sdlwk0000K2_docker.log  (https://smartspend.scm.azurewebsites.net/api/vfs/LogFiles/2025_03_30_lw0sdlwk0000K2_docker.log)
+2025-03-30T19:20:21.374Z ERROR - Container smartspend_1_54e9e39d didn't respond to HTTP pings on port: 8080, failing site start. See container logs for debugging.
+2025-03-30T19:20:21.565Z INFO  - Stopping site smartspend because it failed during startup.
+2025-03-30T19:26:00.570Z INFO  - Starting container for site
+2025-03-30T19:26:00.577Z INFO  - docker run -d --expose=8080 --name smartspend_1_4e420ddd -e WEBSITE_USE_DIAGNOSTIC_SERVER=true -e WEBSITE_SITE_NAME=smartspend -e WEBSITE_AUTH_ENABLED=False -e PORT=8080 -e WEBSITE_ROLE_INSTANCE_ID=0 -e WEBSITE_HOSTNAME=smartspend.azurewebsites.net -e WEBSITE_INSTANCE_ID=f0e56097aef04bacd2c5fe4c7c735706187f5f757e953c33db1f5507c7c92214 appsvc/node:22-lts_20250303.1.tuxprod REDACTED
+2025-03-30T19:26:00.579Z INFO  - Logging is not enabled for this container.Please use https://aka.ms/linux-diagnostics to enable logging to see container logs here.
+2025-03-30T19:26:05.568Z INFO  - Initiating warmup request to container smartspend_1_4e420ddd for site smartspend
+2025-03-30T19:26:36.688Z ERROR - Container smartspend_1_4e420ddd for site smartspend has exited, failing site start
+2025-03-30T19:26:36.704Z ERROR - Container smartspend_1_4e420ddd didn't respond to HTTP pings on port: 8080, failing site start. See container logs for debugging.
+2025-03-30T19:26:36.756Z INFO  - Stopping site smartspend because it failed during startup.Ending Log Tail of existing logs ---Starting Live Log Stream ---
