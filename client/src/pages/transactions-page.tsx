@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import TransactionForm from "@/components/transaction-form";
 import { Card, CardContent } from "@/components/ui/card";
-import { Plus, Search } from "lucide-react";
+import { Plus, Search, Upload } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { 
   Select, 
@@ -16,6 +16,17 @@ import {
 } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Transaction } from "@shared/schema";
+import CSVUploadWidget from "@/components/csv-upload";
+import {
+  Drawer,
+  DrawerClose,
+  DrawerContent,
+  DrawerDescription,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerTrigger,
+} from "@/components/ui/drawer";
 
 export default function TransactionsPage() {
   const [isAddingTransaction, setIsAddingTransaction] = useState(false);
@@ -23,12 +34,12 @@ export default function TransactionsPage() {
   const [search, setSearch] = useState<string>("");
   const [editingTransaction, setEditingTransaction] = useState<Transaction | null>(null);
 
-  const { data: transactions, isLoading } = useQuery({
+  const { data: transactions, isLoading } = useQuery<Transaction[]>({
     queryKey: ["/api/transactions"],
   });
 
   // Filter and search transactions
-  const filteredTransactions = transactions?.filter(transaction => {
+  const filteredTransactions = transactions?.filter((transaction: Transaction) => {
     // Apply type filter
     if (filter === "income" && transaction.type !== "income") return false;
     if (filter === "expense" && transaction.type !== "expense") return false;
@@ -62,7 +73,7 @@ export default function TransactionsPage() {
                 </p>
               </div>
               
-              <div className="mt-4 md:mt-0 flex">
+              <div className="mt-4 md:mt-0 flex space-x-2">
                 <Button onClick={() => {
                   setEditingTransaction(null);
                   setIsAddingTransaction(true);
@@ -70,6 +81,33 @@ export default function TransactionsPage() {
                   <Plus className="h-4 w-4 mr-2" />
                   Add Transaction
                 </Button>
+                
+                <Drawer>
+                  <DrawerTrigger asChild>
+                    <Button variant="outline">
+                      <Upload className="h-4 w-4 mr-2" />
+                      Import CSV
+                    </Button>
+                  </DrawerTrigger>
+                  <DrawerContent>
+                    <div className="mx-auto w-full max-w-4xl">
+                      <DrawerHeader>
+                        <DrawerTitle>Import Transactions</DrawerTitle>
+                        <DrawerDescription>
+                          Upload a CSV file to import multiple transactions at once.
+                        </DrawerDescription>
+                      </DrawerHeader>
+                      <div className="p-4 pb-0">
+                        <CSVUploadWidget />
+                      </div>
+                      <DrawerFooter>
+                        <DrawerClose asChild>
+                          <Button variant="outline">Close</Button>
+                        </DrawerClose>
+                      </DrawerFooter>
+                    </div>
+                  </DrawerContent>
+                </Drawer>
               </div>
             </div>
           </CardContent>

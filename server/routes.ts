@@ -8,8 +8,23 @@ import {
 } from '@shared/schema';
 import { ZodError } from "zod";
 import { fromZodError } from "zod-validation-error";
+import fileUpload from "express-fileupload";
+import { uploadFile } from "./azure-storage";
+import { parseCSVBuffer } from "./csv-parser";
+import path from "path";
+import fs from "fs";
+import os from "os";
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Configure express-fileupload
+  app.use(fileUpload({
+    createParentPath: true,
+    limits: { fileSize: 5 * 1024 * 1024 }, // 5MB max file size
+    abortOnLimit: true,
+    responseOnLimit: "File size limit exceeded (5MB)",
+    useTempFiles: true,
+    tempFileDir: os.tmpdir()
+  }));
   // Setup authentication routes
   setupAuth(app);
 
@@ -188,6 +203,68 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(stats);
     } catch (error) {
       res.status(500).json({ message: "Failed to get dashboard statistics" });
+    }
+  });
+
+  // CSV Upload endpoint
+  app.post("/api/upload-csv", ensureAuthenticated, async (req: Request, res: Response) => {
+    try {
+      if (!req.files || Object.keys(req.files).length === 0) {
+        return res.status(400).json({ message: "No files were uploaded" });
+      }
+
+      const csvFile = req.files.csvFile as fileUpload.UploadedFile;
+      
+      // Validate file type
+      if (!csvFile.name.toLowerCase().endsWith('.csv')) {
+        return res.status(400).json({ message: "Only CSV files are allowed" });
+      }
+
+      // Save file to Azure Storage
+      const fileUrl = await uploadFile(csvFile.data, csvFile.name);
+      
+      // Parse CSV file
+      const transactions = await parseCSVBuffer(csvFile.data);
+      
+      if (transactions.length === 0) {
+        return res.status(400).json({ message: "No valid transactions found in the CSV file" });
+      }
+      
+      // Get user categories for matching
+      const userId = req.user!.id;
+      const userCategories = await storage.getCategories(userId);
+      
+      // Map category names to IDs and add transactions
+      const savedTransactions = [];
+      const errors = [];
+      
+      for (const transaction of transactions) {
+        try {
+          // Add userId to transaction
+          transaction.userId = userId;
+          
+          // Create the transaction
+          const savedTransaction = await storage.createTransaction(transaction as any);
+          savedTransactions.push(savedTransaction);
+        } catch (error) {
+          errors.push({
+            transaction,
+            error: error instanceof Error ? error.message : 'Unknown error',
+          });
+        }
+      }
+      
+      res.status(201).json({
+        message: `Uploaded ${savedTransactions.length} of ${transactions.length} transactions`,
+        successCount: savedTransactions.length,
+        errorCount: errors.length,
+        errors: errors.length > 0 ? errors : undefined,
+        fileUrl,
+      });
+      
+    } catch (error) {
+      console.error("Error processing CSV upload:", error);
+      res.status(500).json({ message: "Failed to process CSV file" });
     }
   });
 
